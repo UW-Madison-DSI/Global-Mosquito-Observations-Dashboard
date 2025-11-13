@@ -1,0 +1,203 @@
+################################################################################
+#                                                                              #
+#                                    app.py                                    #
+#                                                                              #
+################################################################################
+#                                                                              #
+#        This is a web server for managing GPU resource information.           #
+#                                                                              #
+#        Author(s): Abe Megahed                                                #
+#                                                                              #
+################################################################################
+#     Copyright (C) 2025, Data Science Institute, University of Wisconsin      #
+################################################################################
+
+import config
+import mysql.connector
+from flask import Flask, request
+from controllers.observation_controller import ObservationController
+from controllers.habitat_mapper_controller import HabitatMapperController
+from controllers.inaturalist_controller import iNaturalistController
+from controllers.land_cover_controller import LandCoverController
+from controllers.mosquito_alert_controller import MosquitoAlertController
+from controllers.country_controller import CountryController
+from flask_cors import CORS
+
+################################################################################
+#                                   globals                                    #
+################################################################################ 
+
+db = {
+	'host': config.DB_HOST,
+	'port': config.DB_PORT,
+	'username': config.DB_USERNAME,
+	'password': config.DB_PASSWORD,
+	'database': config.DB_DATABASE	
+}
+
+################################################################################
+#                                initialization                                #
+################################################################################
+
+app = Flask(__name__)
+CORS(app)
+
+# configure app fron config.py
+app.config.from_object(config)
+
+################################################################################
+#                                    routes                                    #
+################################################################################
+
+#
+# get routes
+#
+
+@app.get('/')
+def get_home():
+	return "<h1>Welcome to the Mosquito Observations API.</h1>"
+
+@app.get('/observations/<source>')
+def get_observations(source):
+	
+	"""
+	Get observation information.
+
+	Return
+		array: The list of observations.
+	"""
+
+	# get query string parameters
+	#
+	options = {
+		'countries': request.args.get('countries').split(',') if request.args.get('countries') is not None else None,
+		'before': request.args.get('before'),
+		'after': request.args.get('after'),
+		'genera': request.args.get('genera').split(',') if request.args.get('genera') is not None else None,
+		'species': request.args.get('species').split(',') if request.args.get('species') is not None else None
+	}
+
+	# get data
+	#
+	match (source):
+		case 'habitat-mapper':
+			return HabitatMapperController.get_all(db, options)
+		case 'inaturalist':
+			return iNaturalistController.get_all(db, options)
+		case 'land-cover':
+			return LandCoverController.get_all(db, options)
+		case 'mosquito-alert':
+			return MosquitoAlertController.get_all(db, options)
+
+@app.get('/observations/<source>/<id>')
+def get_observation(source, id):
+	
+	"""
+	Get observation information.
+
+	Return
+		object: The observation data.
+	"""
+
+	match (source):
+		case 'habitat-mapper':
+			return HabitatMapperController.get_index(db, id)
+		case 'inaturalist':
+			return iNaturalistController.get_index(db, id)
+		case 'land-cover':
+			return LandCoverController.get_index(db, id)
+		case 'mosquito-alert':
+			return MosquitoAlertController.get_index(db, id)
+
+@app.get('/observations/<source>/num')
+def get_num_observations(source):
+	
+	"""
+	Get number of observations.
+
+	Return
+		int: The number of observations.
+	"""
+
+	# get query string parameters
+	#
+	before = request.args.get('before');
+	after = request.args.get('after');
+	options = {
+		'before': before,
+		'after': after
+	}
+
+	# get counts
+	#
+	match (source):
+		case 'habitat-mapper':
+			return HabitatMapperController.get_num(db, options)
+		case 'inaturalist':
+			return iNaturalistController.get_num(db, options)
+		case 'land-cover':
+			return LandCoverController.get_num(db, options)
+		case 'mosquito-alert':
+			return MosquitoAlertController.get_num(db, options)
+
+@app.get('/countries')
+def get_countries():
+
+	"""
+	Get list of countries.
+
+	Return
+		array: The list of countries.
+	"""
+
+	return CountryController.get_all(db)
+
+@app.get('/countries/num')
+def get_num_countries():
+
+	"""
+	Get number of countries.
+
+	Return
+		array: The number of countries.
+	"""
+
+	return CountryController.get_num(db)
+
+@app.get('/genera')
+def get_genera():
+
+	"""
+	Get list of genera.
+
+	Return
+		array: The list of genera (from iNaturalist).
+	"""
+
+	indices = request.args.get('indices');
+	if indices:
+		return iNaturalistController.get_genera_by_indices(db, indices)
+	else:
+		return iNaturalistController.get_genera(db)
+
+@app.get('/species')
+def get_species():
+
+	"""
+	Get list of species.
+
+	Return
+		array: The list of species (from iNaturalist).
+	"""
+
+	return iNaturalistController.get_species(db)
+
+################################################################################
+#                                     main                                     #
+################################################################################
+
+if __name__ == '__main__':
+	if (app.config['PORT'] == 443):
+		app.run(host=app.config['HOST'], port=443, ssl_context=(app.config['SSL_CERT'], app.config['SSL_KEY']), threaded=True, debug=True)
+	else:
+		app.run(host=app.config['HOST'], port=app.config['PORT'], threaded=True, debug=True)

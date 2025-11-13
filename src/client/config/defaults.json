@@ -1,0 +1,57 @@
+{
+	"application": {
+		"name": "Global Mosquito Observation Dashboard (GMOD)",
+		"title": "GMOD",
+		"year": "2025",
+		"organization": {
+			"name": "mosquitodashboard.org",
+			"url": "http://mosquitodashboard.org"
+		}
+	},
+
+	"footer": {
+		"logo": "images/logos/uw-logo-white.png"
+	},
+
+	"map": {
+		"center": [30, 0],
+		"zoom": 2,
+		"mode": "map",
+		"markerSize": {
+			"desktop": 6,
+			"mobile": 20
+		}
+	},
+
+	"leaflet": {
+		"inertia": true,
+		"inertiaDeceleration": 500,
+		"minZoom": 2,
+		"maxZoom": 18,
+		"zoomControl": false
+	},
+
+	"navbar": {
+		"icon": "images/logos/icon.svg",
+		"title": "GMOD",
+		"navs": {
+			"about": {
+				"text": "About",
+				"icon": "fa fa-info-circle",
+				"href": "#about"
+			},
+			"data": {
+				"text": "Data",
+				"icon": "fa fa-table",
+				"href": "#data"
+			}
+		}
+	},
+
+	"clustering": {
+		"disableClusteringAtZoom": 7,
+		"spiderfyOnMaxZoom": false,
+		"showCoverageOnHover": false,
+		"animate": true
+	}
+}
