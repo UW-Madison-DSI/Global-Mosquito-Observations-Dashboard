@@ -34,6 +34,8 @@
 	"navbar": {
 		"icon": "images/logos/icon.svg",
 		"title": "GMOD",
+		"align": "center",
+
 		"navs": {
 			"about": {
 				"text": "About",
@@ -41,9 +43,15 @@
 				"href": "#about"
 			},
 			"data": {
-				"text": "Data",
+				"text": "Contribute",
 				"icon": "fa fa-table",
-				"href": "#data"
+				"href": "#data",
+				"color": "#3060e0"
+			},
+			"code": {
+				"text": "Download",
+				"icon": "fab fa-github",
+				"href": "https://github.com/UW-Madison-DSI/Global-Mosquito-Observations-Dashboard"
 			}
 		}
 	},

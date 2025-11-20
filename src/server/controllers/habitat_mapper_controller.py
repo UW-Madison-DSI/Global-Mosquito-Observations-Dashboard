@@ -46,8 +46,9 @@ class HabitatMapperController(ObservationController):
 		#
 		observations = []
 		data = ObservationController.get_all(db, query)
-		for item in data:
-			observations.append(Observation.to_values(item))
+		if data != 'Could not connect to database':
+			for item in data:
+				observations.append(Observation.to_values(item))
 		return observations
 
 	@staticmethod

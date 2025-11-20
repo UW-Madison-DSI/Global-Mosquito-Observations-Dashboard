@@ -12,7 +12,7 @@
 #     Copyright (C) 2025, Data Science Institute, University of Wisconsin      #
 ################################################################################
 
-import config
+import os
 import mysql.connector
 from flask import Flask, request
 from controllers.observation_controller import ObservationController
@@ -22,28 +22,28 @@ from controllers.land_cover_controller import LandCoverController
 from controllers.mosquito_alert_controller import MosquitoAlertController
 from controllers.country_controller import CountryController
 from flask_cors import CORS
-
-################################################################################
-#                                   globals                                    #
-################################################################################ 
-
-db = {
-	'host': config.DB_HOST,
-	'port': config.DB_PORT,
-	'username': config.DB_USERNAME,
-	'password': config.DB_PASSWORD,
-	'database': config.DB_DATABASE	
-}
+from dotenv import load_dotenv
 
 ################################################################################
 #                                initialization                                #
 ################################################################################
 
+# load environment settings
+#
+load_dotenv()
+
+# configure database
+#
+db = {
+	'host': os.getenv('DB_HOST'),
+	'port': os.getenv('DB_PORT'),
+	'username': os.getenv('DB_USERNAME'),
+	'password': os.getenv('DB_PASSWORD'),
+	'database': os.getenv('DB_DATABASE')	
+}
+
 app = Flask(__name__)
 CORS(app)
-
-# configure app fron config.py
-app.config.from_object(config)
 
 ################################################################################
 #                                    routes                                    #
@@ -197,7 +197,8 @@ def get_species():
 ################################################################################
 
 if __name__ == '__main__':
+
 	if (app.config['PORT'] == 443):
-		app.run(host=app.config['HOST'], port=443, ssl_context=(app.config['SSL_CERT'], app.config['SSL_KEY']), threaded=True, debug=True)
+		app.run(host=os.getenv['HOST'], port=443, ssl_context=(os.getenv['SSL_CERT'], os.getenv['SSL_KEY']), threaded=True, debug=True)
 	else:
-		app.run(host=app.config['HOST'], port=app.config['PORT'], threaded=True, debug=True)
+		app.run(host=os.getenv['HOST'], port=os.getenv['PORT'], threaded=True, debug=True)

@@ -1,4 +1,4 @@
 {
-	"server": "localhost:5000",
-	"server2": "https://mosquito-dashboard-api.services.dsi.wisc.edu"
+	"server": "http://localhost:5000",
+	"remote_server": "https://mosquito-dashboard-api.services.dsi.wisc.edu"
 }
